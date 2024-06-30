@@ -25,8 +25,20 @@ const Home = () => {
       setFetchError(null);
     }
   }
+
+  // Create a function to handle inserts
+  const handleDBChanges = (payload) => {
+    fetchSmoothies();
+    console.log('Change received!', payload)
+  }
   useEffect(() => {
     fetchSmoothies();
+
+    // Listen to inserts
+    supabase
+      .channel('smoothies')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'smoothies' }, handleDBChanges)
+      .subscribe();
   }, []);
 
   const handleDelete = async (id) => {
